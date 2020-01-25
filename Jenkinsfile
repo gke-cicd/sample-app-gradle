@@ -80,7 +80,7 @@ pipeline {
       }
       steps {
         container('gradle') {
-         // sh "mvn -Pprod clean verify sonar:sonar"
+         // sh "gradle -Pprod clean verify sonar:sonar"
           // If code coverage do not comply with the minimum required the pipeline should send a Github failed check in the PR.
         }
       }
