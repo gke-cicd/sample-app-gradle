@@ -9,6 +9,29 @@ pipeline {
     DOCKER_REGISTRY_ORG = 'gke-cicd'
   }
   stages {
+    stage('App. test MVN') {
+      when {
+        branch 'PR-*'
+      }
+      steps {
+        container('maven') {
+          sh "mvn verify"
+          // If error the pipeline should send a Github failed check in the PR.
+        }
+      }
+    }
+  stage('Sonar Code analysis') {
+      when {
+        branch 'PR-*'
+      }
+      steps {
+        container('maven') {
+          //sh "mvn -Pprod clean verify sonar:sonar"
+          // This stage can be executed in parallel with the application tests.
+          // If code coverage do not comply with the minimum required the pipeline should send a Github failed check in the PR.
+        }
+      }
+    }
     stage('CI Build and push snapshot') {
       when {
         branch 'PR-*'
@@ -48,6 +71,17 @@ pipeline {
           sh "gradle clean build"
           sh "export VERSION=`cat VERSION` && skaffold build -f skaffold.yaml"
           sh "jx step post build --image $DOCKER_REGISTRY/$ORG/$APP_NAME:\$(cat VERSION)"
+        }
+      }
+    }
+    stage('Sonar code analysis in master') {
+      when {
+        branch 'master'
+      }
+      steps {
+        container('maven') {
+         // sh "mvn -Pprod clean verify sonar:sonar"
+          // If code coverage do not comply with the minimum required the pipeline should send a Github failed check in the PR.
         }
       }
     }
