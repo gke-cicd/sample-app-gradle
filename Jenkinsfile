@@ -9,13 +9,13 @@ pipeline {
     DOCKER_REGISTRY_ORG = 'gke-cicd'
   }
   stages {
-    stage('App. test MVN') {
+    stage('App. test Gradle') {
       when {
         branch 'PR-*'
       }
       steps {
-        container('maven') {
-          sh "mvn verify"
+        container('gradle') {
+          sh "gradle test"
           // If error the pipeline should send a Github failed check in the PR.
         }
       }
@@ -25,8 +25,8 @@ pipeline {
         branch 'PR-*'
       }
       steps {
-        container('maven') {
-          //sh "mvn -Pprod clean verify sonar:sonar"
+        container('gradle') {
+          //sh "gradle -Pprod clean verify sonar:sonar"
           // This stage can be executed in parallel with the application tests.
           // If code coverage do not comply with the minimum required the pipeline should send a Github failed check in the PR.
         }
@@ -79,7 +79,7 @@ pipeline {
         branch 'master'
       }
       steps {
-        container('maven') {
+        container('gradle') {
          // sh "mvn -Pprod clean verify sonar:sonar"
           // If code coverage do not comply with the minimum required the pipeline should send a Github failed check in the PR.
         }
